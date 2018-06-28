@@ -1,0 +1,22 @@
+sudo: required
+services:
+- docker
+language: bash
+env:
+  global:
+  - DOCKER_NAME=rvben/rpi-openvpn
+  - DOCKER_USER=rvben
+  - secure: i6NZWc7W/uXgGXGetY9WcghoCkCckh3yE3XNvEyLrM8f0zU0Jwn3YXNe0m6bGfCn1r3nfY+X6veJA4FfBs2So6L73oj3HAtGoOfVDqzXEjkfknOksrXjXkS1SWPbl5X52+6NkZBs+Yq3W+hcNoMmUlayAGtWNHG6ZI4m4o/vAqndpFzqXO2eLfF/2RJvW51iVU6DniS85qxG2HZFSrBNySd62dbFYPVNXHCTM56bu9ikTNgbw5Dr5hAXtNryTJdDA65tICgRNGM2p38fLLRb5e3PGw32cag+ahjbTvL6MFRtM8GPs977B5ohfoy7yZiKLRPv4bSLTQUWD1vifRrmHeKbfYr/kmSL5Cxm1s4xTurdT1AuJPiN4WQlMjoIq+tjAZndtICMgLwVPle8NAOLBS9DYVIg8PYida01BRkSzhCx8VwxYYjhUWg2wXPPPpLU3wOf3W+yrHlKI+G8U/HGZ6312Fjs2C5/FcB45cSGSslMSrI7WWXWs6Z1Sl+bmNd8dX+sd+gMJbw22bxPwF8hrKioIUGU2puT65boocEVKR+Z9zr2U779q4r77CCvioiLhUHhDhbWaBGdpLM0eCjBG/Q9JlUbzmdVqYSlhDDVqM6emB7BFHPSuCvV7mcBBvRLbIt5gYs6t5k/cc06HWX0MNPeiknPjOeRCKgEkS75ElI=
+script:
+- git clone https://github.com/kylemanna/docker-openvpn.git
+- cd docker-openvpn
+- sed -i 's|FROM alpine:latest|FROM multiarch/alpine:armhf-latest-stable|' Dockerfile
+- sed -i 's|LABEL maintainer="Kyle Manna <kyle@kylemanna.com>"|LABEL maintainer="Ruben
+  Jongejan <ruben.jongejan@gmail.com>"|' Dockerfile
+- docker run --rm --privileged multiarch/qemu-user-static:register --reset
+- docker build -t $DOCKER_NAME .
+- |
+  if [ "$TRAVIS_BRANCH" == "master" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
+    docker login -u="$DOCKER_USER" -p="$DOCKER_PASS"
+    docker push $DOCKER_NAME
+  fi
