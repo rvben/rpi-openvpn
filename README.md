@@ -28,7 +28,7 @@ For convenience, a copy of the 'Quick Start' section of [kylemanna/openvpn](http
 
 * Start OpenVPN server process
 
-        docker run -v $OVPN_DATA:/etc/openvpn -d -p 1194:1194/udp --cap-add=NET_ADMIN rvben/rpi-openvpn
+        docker run -v $OVPN_DATA:/etc/openvpn -d -p 1194:1194/udp --cap-add=NET_ADMIN --device=/dev/net/tun rvben/rpi-openvpn
 
 * Generate a client certificate without a passphrase
 
